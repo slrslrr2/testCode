@@ -253,19 +253,110 @@ void assumeTrue_test(){
 >
 > Windows가 아니기때문에 **assumeTrue(property.startsWith("Windows"));**로 인해 <br>System.out.println("실행2");는 실행하지 않음을 알 수 있다.
 
+```java
+@Test
+@EnabledOnOs({OS.MAC, OS.LINUX})
+@DisplayName("MAC, LINUX와 관련된 운영체제만 실행")
+void enable_related(){
+}
+
+@Test
+@DisabledOnOs({OS.MAC, OS.LINUX})
+@DisplayName("MAC, LINUX와 관련된 운영체제를 제외하고 실행")
+void disabled_related(){
+}
+
+@Test
+@EnabledOnJre({JRE.JAVA_8, JRE.JAVA_11})
+@DisplayName("JAVA8, 11버전만 실행")
+void enable_jre_related(){
+}
+
+@Test
+@DisabledOnJre({JRE.JAVA_8, JRE.JAVA_11})
+@DisplayName("JAVA8, 11버전만 실행안함")
+void disabled_jre_related(){
+}
+```
 
 
 
 
 
+## Unit 5 테스트 반복하기 1부
+
+### **@RepeatedTest**
+
+- 반복 횟수와 반복 테스트 이름을 설정할 수 있다.
+  - {displayName}
+  - {currentRepetition}
+  - {totalRepetitions}
+- RepetitionInfo 타입의 인자를 받을 수 있다.
+
+```java
+@DisplayName("10번 반복하는 테스트")
+@RepeatedTest(value = 10, name="{displayName}, {currentRepetition}/{totalRepetitions}")
+void repeated_test(RepetitionInfo repetitionInfo){
+  System.out.println(repetitionInfo.getCurrentRepetition()); //몇번째 테스트인지
+  System.out.println(repetitionInfo.getTotalRepetitions()); // 전체 테스트 갯수
+}
+```
+
+![image-20220807202407027](image-20220807202407027.png)
+
+> @RepeatedTest의 2번째 parameter에 설정한 내용의 테스트가 하단에 표시된다
 
 
 
+### **파라미터 1개**를 지정해서 반복하는 메서드
+
+- @ParameterizedTest
+- @ValueSource
+
+```java
+@DisplayName("파라미터를 지정하여 반복하는 메서드")
+@ParameterizedTest(name="{displayName} {index} {arguments}")
+@ValueSource(strings = {"첫번째Param", "두번째Param", "세번째Param"})
+@NullAndEmptySource
+void iterator_with_parameter(String message){
+  System.out.println("message = " + message);
+}
+```
+
+> - @ParameterizedTest(name="{displayName} {index} {arguments}")
+>   - 파라미터를 지정하여 반복하는 메서드 1 첫번째Param
+>
+> - **@NullAndEmptySource**을 사용하면 파라미터를 빈값이나 null로 넘겨준다
+
+![image-20220807205204184](image-20220807205204184.png)
 
 
 
+### **파라미터 1개**를 지정해서 Study라는 클래스를 생성자함수를 통해 생성하여 파라미터로 받는 방법
 
+- @ParameterizedTest, @ValueSource
+- SimpleArgumentConverter, @ConvertWith
 
+```java
+@DisplayName("생성자 함수에 파라미터를 넘겨서 Study클래스 만들기")
+@ParameterizedTest(name="{displayName}")
+@ValueSource(ints = {10, 20, 40})
+void create_study_throught_converter(@ConvertWith(StudyConverter.class) Study study){
+  System.out.println("study = " + study);
+}
 
+static class StudyConverter extends SimpleArgumentConverter{
+  @Override
+  protected Object convert(Object source, Class<?> targetType) throws ArgumentConversionException {
+    assertEquals(targetType, Study.class, "Can only convert to Study");
+    return new Study(Integer.parseInt(source.toString()));
+  }
+}
+```
 
+**SimpleArgumentConverter**를 상송받아 **convert**라는 메소드를 Override함으로써<br>
+
+- Study.class에 한하여 생성가능하도록 하고 <br>assertEquals(targetType, Study.class, "Can only convert to Study");
+- **source.toString()**을 통해 argument를 받아 Study를 생성한다<br>return new Study(Integer.parseInt(source.toString()));
+- @ConvertWith(StudyConverter.class) Study study를 통하여 study 매개변수를 만든다.
 
