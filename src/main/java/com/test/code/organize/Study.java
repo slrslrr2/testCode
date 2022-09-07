@@ -1,5 +1,7 @@
 package com.test.code.organize;
 
+import com.test.code.organize.inflearnthejavatest.domain.Member;
+
 public class Study {
     private StudyStatus status; //= StudyStatus.DRAFT;
     private int limit;
@@ -15,5 +17,8 @@ public class Study {
 
     public int getLimit() {
         return limit;
+    }
+
+    public void setOwner(Member member) {
     }
 }

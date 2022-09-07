@@ -13,8 +13,11 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class StudyTest2 {
     @Test
+    @Order(1)
     void assumeTrue_test(){
         String property = System.getProperty("os.name");
         System.out.println(property);
@@ -25,6 +28,7 @@ public class StudyTest2 {
     }
 
     @Test
+    @Order(2)
     @EnabledOnOs({OS.MAC, OS.LINUX})
     @DisplayName("MAC, LINUX와 관련된 운영체제만 실행")
     void enable_related(){
